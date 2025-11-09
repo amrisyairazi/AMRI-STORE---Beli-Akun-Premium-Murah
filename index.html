@@ -158,20 +158,23 @@
         color: var(--color-primary);
     }
     
-    /* Tombol Home */
+    /* Tombol Home - UPDATED */
     .home-button{
-      background:linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
       color:#fff;
       padding:8px 14px;
-      border-radius:10px;
+      border-radius:8px;
       text-decoration:none;
       font-weight:600;
-      box-shadow:0 6px 18px rgba(0, 123, 255, 0.3); 
+      border: none;
+      cursor:pointer;
+      box-shadow:0 6px 18px rgba(0, 123, 255, 0.3);
       transition:transform .2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow .2s;
+      opacity: 1;
     }
     .home-button:hover{ 
       transform:translateY(-2px) scale(1.02); 
-      box-shadow:0 8px 22px rgba(0, 123, 255, 0.4); 
+      box-shadow:0 8px 22px rgba(0, 123, 255, 0.4);
     }
 
     /* Main container */
@@ -681,33 +684,24 @@
         transform: translateX(20px);
     }
 
-    /* Animasi Produk Card */
-    @keyframes bounceInUp {
-        from, 60%, 75%, 90%, to {
-            animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-        }
+    /* Animasi Produk Card - DIPERBAIKI */
+    @keyframes productCardAppear {
         0% {
             opacity: 0;
-            transform: translate3d(0, 80px, 0) scale(0.9);
+            transform: translateY(30px) scale(0.95);
         }
         60% {
             opacity: 1;
-            transform: translate3d(0, -20px, 0) scale(1.05);
+            transform: translateY(-5px) scale(1.02);
         }
-        75% {
-            transform: translate3d(0, 10px, 0) scale(0.98);
-        }
-        90% {
-            transform: translate3d(0, -5px, 0) scale(1.02);
-        }
-        to {
-            transform: translate3d(0, 0, 0) scale(1);
+        100% {
             opacity: 1;
+            transform: translateY(0) scale(1);
         }
     }
 
-    .product-card.loaded {
-        animation: bounceInUp 0.8s forwards; 
+    .product-card.animated {
+        animation: productCardAppear 0.6s ease forwards;
     }
 
     /* Efek saat hover */
@@ -749,7 +743,7 @@
   <header class="header">
     <h1 id="storeTitle" onclick="secretClickAdmin()">AMRI STORE</h1> 
     <div class="nav-links">
-        <a href="#" class="home-button" id="mainHomeButton" onclick="showPage('main'); return false;">Home</a>
+        <a href="#" class="home-button" id="mainHomeButton">Home</a>
         <button id="logoutButton" style="display:none;" onclick="logoutAdmin()">Logout</button>
     </div>
   </header>
@@ -761,7 +755,7 @@
     </div>
     
     <div id="productDetailPage" class="full-page-content" style="display: none;">
-        <button class="back-button" onclick="showPage('main'); return false;"> 
+        <button class="back-button" id="backToHomeButton"> 
             <i class="fas fa-arrow-left"></i> Kembali ke Beranda
         </button>
         <div class="detail-grid">
@@ -774,7 +768,7 @@
     </div>
 
     <div id="paymentPage" class="full-page-content" style="display: none;">
-        <button class="back-button" onclick="history.back(); return false;"> 
+        <button class="back-button" id="backToDetailButton"> 
             <i class="fas fa-arrow-left"></i> Batal & Kembali ke Produk
         </button>
         
@@ -786,7 +780,7 @@
             <div class="detail-right payment-detail-right">
                 
                 <h2 style="color:var(--color-text); margin-bottom:6px;">Detail Pembelian</h2>
-                <p class="qris-note">Pindai QRIS di samping menggunakan e-wallet favorit Anda (Dana / OVO / GoPay / ShopeePay / dll).</p>
+                <p class="qris-note">Pindai QRIS di atas menggunakan e-wallet favorit Anda (Dana / OVO / GoPay / ShopeePay / dll).</p>
 
                 <h3 style="margin-top:12px; color:var(--color-text)">Produk: <span id="paymentProductTitle" style="font-weight:700"></span></h3>
                 <p class="qris-note" style="margin-bottom: 5px;">Total Pembayaran:</p>
@@ -803,7 +797,7 @@
     </div>
 
     <div id="termsPage" class="full-page-content" style="display: none;">
-        <button class="back-button" onclick="showPage('main'); return false;">
+        <button class="back-button" id="backToHomeFromTermsButton">
             <i class="fas fa-arrow-left"></i> Kembali ke Beranda
         </button>
         <h1>Syarat & Ketentuan</h1>
@@ -847,7 +841,7 @@
     </div>
     
     <div id="warrantyPage" class="full-page-content" style="display: none;">
-        <button class="back-button" onclick="showPage('main'); return false;">
+        <button class="back-button" id="backToHomeFromWarrantyButton">
             <i class="fas fa-arrow-left"></i> Kembali ke Beranda
         </button>
         <h1>Kebijakan Garansi Produk Digital</h1>
@@ -971,9 +965,9 @@
             </div>
         </div>
 
-        <!-- Daftar Produk -->
+        <!-- Daftar Produk & Konfigurasi Store -->
         <div class="admin-grid" id="adminProductGrid">
-            <!-- Produk akan di-render di sini -->
+            <!-- Produk & Konfigurasi akan di-render di sini -->
         </div>
     </div>
   </main>
@@ -989,23 +983,23 @@
             <h2>Kontak Kami</h2>
             <div class="contact-item">
                 <i class="fas fa-envelope"></i>
-                <a href="mailto:amristore@gmail.com" target="_blank">amristore@gmail.com</a>
+                <a href="#" id="footerEmail" target="_blank">Loading...</a>
             </div>
             <div class="contact-item">
                 <i class="fab fa-whatsapp"></i>
-                <a href="https://wa.me/6283829182361" target="_blank">6283829182361</a>
+                <a href="#" id="footerWhatsApp" target="_blank">Loading...</a>
             </div>
             <div class="contact-item">
                 <i class="fas fa-map-marker-alt"></i>
-                <a href="https://www.google.com/maps/search/?api=1&query=Cisaat%2C+Sukabumi%2C+Indonesia" target="_blank">Cisaat, Sukabumi, Indonesia.</a>
+                <a href="#" id="footerLocation" target="_blank">Loading...</a>
             </div>
         </div>
 
         <div class="footer-section">
           <h2>Lainnya</h2>
-          <a href="#" onclick="showPage('terms'); return false;">Syarat & Ketentuan</a><br>
-          <a href="#" onclick="showPage('warranty'); return false;">Garansi</a><br>
-          <a href="https://wa.me/6283829182361" target="_blank">Bantuan</a>
+          <a href="#" id="termsLink">Syarat & Ketentuan</a><br>
+          <a href="#" id="warrantyLink">Garansi</a><br>
+          <a href="#" id="footerHelp" target="_blank">Bantuan</a>
         </div>
     </div>
     <div class="copyright">© 2025 AMRI STORE. All Rights Reserved.</div>
@@ -1068,7 +1062,7 @@
     const productDescription = document.getElementById('productDescription');
     const variantsContainer = document.getElementById('variantsContainer');
 
-    const paymentImageURL = "https://ar-hosting.pages.dev/1761073459128.jpg";
+    // Default WhatsApp contact - akan diganti dengan data dari config
     const whatsappContactBase = "https://wa.me/6283829182361";
     
     const ADMIN_PASSWORD = "MOCHAWRE"; 
@@ -1077,8 +1071,15 @@
     const CLICK_THRESHOLD = 3; 
     const CLICK_TIMEOUT = 400; 
 
-    // Data default produk
+    // Data default produk DAN KONFIGURASI STORE
     const defaultProductData = {
+      '_store_config': {
+        storeName: "AMRI STORE",
+        whatsappNumber: "6283829182361",
+        qrisImage: "https://ar-hosting.pages.dev/1761073459128.jpg",
+        email: "amristore@gmail.com",
+        location: "Cisaat, Sukabumi, Indonesia."
+      },
       'alight_motion': {
         id: 'alight_motion', name: "Alight Motion", category: "DESAIN", imgSrc: "https://ar-hosting.pages.dev/1761083773095.png",
         description: "Alight Motion READY BANYAK. Pembayaran via QRIS dan open 24 jam. Garansi AM 6 Bulan, Tutorial login dikirim saat pesanan sudah sukses melalui whatsapp.",
@@ -1111,6 +1112,85 @@
     let currentPage = 'main';
     let isDataLoaded = false;
     let variantCounter = 0;
+
+    // ==================== FUNGSI KONFIGURASI STORE ====================
+    function loadStoreConfig() {
+        return currentProductData['_store_config'] || defaultProductData['_store_config'];
+    }
+
+    function saveStoreConfig(config) {
+        currentProductData['_store_config'] = config;
+        saveData(false); // false agar tidak refresh halaman
+        updateUIWithConfig(); // Update UI dengan config baru
+    }
+
+    function updateUIWithConfig() {
+        const config = loadStoreConfig();
+        
+        // Update store title
+        document.getElementById('storeTitle').textContent = config.storeName;
+        
+        // Update footer contact info
+        const footerEmail = document.getElementById('footerEmail');
+        const footerWhatsApp = document.getElementById('footerWhatsApp');
+        const footerLocation = document.getElementById('footerLocation');
+        const footerHelp = document.getElementById('footerHelp');
+        
+        if (footerEmail) {
+            footerEmail.href = `mailto:${config.email}`;
+            footerEmail.textContent = config.email;
+        }
+        
+        if (footerWhatsApp) {
+            footerWhatsApp.href = `https://wa.me/${config.whatsappNumber}`;
+            footerWhatsApp.textContent = config.whatsappNumber;
+        }
+        
+        if (footerLocation) {
+            footerLocation.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.location)}`;
+            footerLocation.textContent = config.location;
+        }
+
+        if (footerHelp) {
+            footerHelp.href = `https://wa.me/${config.whatsappNumber}`;
+        }
+        
+        // Update WhatsApp links di seluruh halaman
+        updateAllWhatsAppLinks(config.whatsappNumber);
+    }
+
+    function updateAllWhatsAppLinks(whatsappNumber) {
+        const waLinks = document.querySelectorAll('a[href*="wa.me"]');
+        waLinks.forEach(link => {
+            if (link.href.includes('wa.me')) {
+                link.href = `https://wa.me/${whatsappNumber}`;
+            }
+        });
+    }
+
+    function saveStoreConfiguration() {
+        const newConfig = {
+            storeName: document.getElementById('configStoreName').value.trim(),
+            whatsappNumber: document.getElementById('configWhatsApp').value.trim(),
+            email: document.getElementById('configEmail').value.trim(),
+            location: document.getElementById('configLocation').value.trim(),
+            qrisImage: document.getElementById('configQRIS').value.trim()
+        };
+        
+        // Validasi
+        if (!newConfig.storeName || !newConfig.whatsappNumber || !newConfig.email || !newConfig.location || !newConfig.qrisImage) {
+            alert('Semua field konfigurasi harus diisi!');
+            return;
+        }
+        
+        if (!newConfig.whatsappNumber.match(/^\d+$/)) {
+            alert('Nomor WhatsApp harus berupa angka tanpa simbol!');
+            return;
+        }
+        
+        saveStoreConfig(newConfig);
+        alert('Konfigurasi store berhasil disimpan!');
+    }
 
     // ==================== FUNGSI VARIAN PRODUK ====================
     function addVariantField(variantData = { title: '', rawPrice: 10000, isAvailable: true }) {
@@ -1219,7 +1299,7 @@
         });
     }
 
-    // ==================== FUNGSI YANG MISSING ====================
+    // ==================== FUNGSI UTAMA ====================
     function generateUniqueCode() {
         return Math.floor(Math.random() * (400 - 100 + 1)) + 100;
     }
@@ -1296,15 +1376,17 @@
       showLoadingScreen("Mempersiapkan pembayaran...");
       
       setTimeout(() => {
+        const config = loadStoreConfig();
         const uniqueCode = generateUniqueCode();
         const finalPriceNumber = basePriceNumber + uniqueCode;
         const finalPriceFormatted = formatPrice(finalPriceNumber);
         
-        const whatsappMessage = `Halo AMRI STORE, saya sudah melakukan pembayaran via QRIS untuk produk:\n\n*${productName}* - ${variantTitle}\nHarga Total (termasuk kode unik ${uniqueCode}): ${finalPriceFormatted}\n\nMohon segera diproses. Terima kasih!`;
+        const whatsappMessage = `Halo ${config.storeName}, saya sudah melakukan pembayaran via QRIS untuk produk:\n\n*${productName}* - ${variantTitle}\nHarga Total (termasuk kode unik ${uniqueCode}): ${finalPriceFormatted}\n\nMohon segera diproses. Terima kasih!`;
         const encodedMessage = encodeURIComponent(whatsappMessage);
-        const whatsappLink = `${whatsappContactBase}?text=${encodedMessage}`;
+        const whatsappLink = `https://wa.me/${config.whatsappNumber}?text=${encodedMessage}`;
 
-        qrisImage.src = paymentImageURL;
+        // Gunakan QRIS dari config
+        qrisImage.src = config.qrisImage;
         paymentProductTitle.textContent = `${productName} (${variantTitle})`;
         
         paymentProductPrice.innerHTML = `
@@ -1449,7 +1531,52 @@
     function renderAdminDashboard() {
         adminProductGrid.innerHTML = '';
         
+        // ===== BAGIAN KONFIGURASI STORE =====
+        const config = loadStoreConfig();
+        const configCard = document.createElement('div');
+        configCard.className = 'admin-card';
+        configCard.innerHTML = `
+            <h3 style="color: var(--color-primary); margin-bottom: 20px;">⚙️ Konfigurasi Store</h3>
+            
+            <div class="admin-form-group">
+                <label>Nama Store:</label>
+                <input type="text" id="configStoreName" value="${config.storeName}" placeholder="Nama toko Anda">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Nomor WhatsApp (tanpa +):</label>
+                <input type="text" id="configWhatsApp" value="${config.whatsappNumber}" placeholder="628123456789">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Email:</label>
+                <input type="email" id="configEmail" value="${config.email}" placeholder="email@example.com">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>Lokasi:</label>
+                <input type="text" id="configLocation" value="${config.location}" placeholder="Kota, Provinsi">
+            </div>
+            
+            <div class="admin-form-group">
+                <label>URL Gambar QRIS:</label>
+                <input type="text" id="configQRIS" value="${config.qrisImage}" placeholder="https://example.com/qris.jpg">
+                <small style="color: var(--color-muted);">Preview QRIS saat ini:</small>
+                <img src="${config.qrisImage}" alt="QRIS Preview" style="max-width: 200px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px;">
+            </div>
+            
+            <div class="admin-form-actions">
+                <button class="admin-action-button admin-add-button" onclick="saveStoreConfiguration()">
+                    <i class="fas fa-save"></i> Simpan Konfigurasi
+                </button>
+            </div>
+        `;
+        adminProductGrid.appendChild(configCard);
+        
+        // ===== BAGIAN PRODUK =====
         for (const key in currentProductData) {
+            if (key === '_store_config') continue; // Skip config, sudah ditangani di atas
+            
             const product = currentProductData[key];
             let variantHtml = '';
             
@@ -1587,6 +1714,8 @@
         let productIndex = 0;
 
         for (const key in currentProductData) {
+            if (key === '_store_config') continue; // Skip config
+            
             const product = currentProductData[key];
             const productCard = document.createElement('a');
             productCard.href = '#';
@@ -1604,10 +1733,10 @@
             `;
             productGrid.appendChild(productCard);
 
-            // Trigger animasi setelah render
+            // Trigger animasi setelah render - DIPERBAIKI
             if (currentPage === 'main' || forceReload) { 
                 setTimeout(() => {
-                    productCard.classList.add('loaded');
+                    productCard.classList.add('animated');
                 }, 100 + (productIndex * 80)); // Animasi lebih cepat
             }
             
@@ -1616,61 +1745,118 @@
     }
 
     // ==================== PAGE MANAGEMENT ====================
-    function showPage(page, forceRefresh = false, skipHistory = false) { 
-        const pageElementsMap = {
-            'main': mainContent,
-            'detail': productDetailPage,
-            'terms': termsPage,
-            'warranty': warrantyPage,
-            'payment': paymentPage,
-            'login': adminLoginDiv,
-            'dashboard': adminDashboardDiv
-        };
+    function showPage(page, forceRefresh = false, skipHistory = false) {
+        // Sembunyikan semua halaman terlebih dahulu
+        const allPages = [mainContent, productDetailPage, termsPage, warrantyPage, 
+                         paymentPage, adminLoginDiv, adminDashboardDiv];
         
-        let targetPageElement = pageElementsMap[page];
-        let currentPageElement = pageElementsMap[currentPage];
-
-        // SELALU SEMBUNYIKAN TOMBOL LOGOUT KECUALI DI DASHBOARD
+        allPages.forEach(pageElement => {
+            if (pageElement) pageElement.style.display = 'none';
+        });
+        
+        // Tampilkan footer secara default, sembunyikan untuk halaman tertentu
+        mainFooter.style.display = 'block';
         logoutButton.style.display = 'none';
 
-        if (page === 'login') {
-            if (localStorage.getItem(ADMIN_STORAGE_KEY) === 'true') { showPage('dashboard'); return; }
-        } else if (page === 'dashboard') {
-            if (localStorage.getItem(ADMIN_STORAGE_KEY) !== 'true') { showPage('login'); return; }
-            // HANYA TAMPILKAN LOGOUT DI DASHBOARD
-            logoutButton.style.display = 'block';
-        }
-        
-        mainFooter.style.display = 'none';
-
-        if (!skipHistory && page !== currentPage) {
-            let newHash = (page === 'main') ? '' : `#${page}`;
-            history.pushState({ page: page }, document.title, newHash);
-        }
-        
-        if (currentPageElement) {
-            currentPageElement.style.display = 'none';
+        // Logika autentikasi admin
+        if (page === 'login' && localStorage.getItem(ADMIN_STORAGE_KEY) === 'true') {
+            page = 'dashboard';
+        } else if (page === 'dashboard' && localStorage.getItem(ADMIN_STORAGE_KEY) !== 'true') {
+            page = 'login';
         }
 
-        Object.values(pageElementsMap).forEach(p => { 
-            if (p && p !== targetPageElement) p.style.display = 'none'; 
-        });
-
-        if (targetPageElement) {
-            targetPageElement.style.display = 'block';
-
-            if (page === 'main') {
-                loadProducts(true); 
-                mainFooter.style.display = 'block'; 
-            } else if (page === 'terms' || page === 'warranty' || page === 'payment') {
-                mainFooter.style.display = 'block'; 
-            } else if (page === 'dashboard') {
+        // Tampilkan halaman target
+        switch(page) {
+            case 'main':
+                mainContent.style.display = 'block';
+                if (forceRefresh) {
+                    // Reset animasi produk
+                    const productCards = document.querySelectorAll('.product-card');
+                    productCards.forEach(card => {
+                        card.classList.remove('animated');
+                    });
+                    
+                    // Load ulang produk dengan animasi
+                    setTimeout(() => {
+                        loadProducts(true);
+                    }, 50);
+                }
+                break;
+            case 'detail':
+                productDetailPage.style.display = 'block';
+                mainFooter.style.display = 'none';
+                break;
+            case 'payment':
+                paymentPage.style.display = 'block';
+                mainFooter.style.display = 'none';
+                break;
+            case 'terms':
+                termsPage.style.display = 'block';
+                break;
+            case 'warranty':
+                warrantyPage.style.display = 'block';
+                break;
+            case 'login':
+                adminLoginDiv.style.display = 'block';
+                mainFooter.style.display = 'none';
+                break;
+            case 'dashboard':
+                adminDashboardDiv.style.display = 'block';
+                mainFooter.style.display = 'none';
+                logoutButton.style.display = 'block';
                 renderAdminDashboard();
-            }
+                break;
+            default:
+                mainContent.style.display = 'block';
+        }
+
+        // Update history
+        if (!skipHistory) {
+            const newHash = page === 'main' ? '' : `#${page}`;
+            history.pushState({ page }, document.title, newHash);
         }
         
         currentPage = page;
-        window.scrollTo({ top: 0, behavior: 'instant' }); 
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    function setupEventListeners() {
+        // PERBAIKAN: Setup semua event listener dengan benar
+        document.getElementById('mainHomeButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('main', true);
+        });
+        
+        document.getElementById('backToHomeButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('main', true);
+        });
+        
+        document.getElementById('backToDetailButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('detail');
+        });
+        
+        document.getElementById('backToHomeFromTermsButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('main', true);
+        });
+        
+        document.getElementById('backToHomeFromWarrantyButton').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('main', true);
+        });
+        
+        document.getElementById('termsLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('terms');
+        });
+        
+        document.getElementById('warrantyLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage('warranty');
+        });
     }
 
     // ==================== INITIALIZATION ====================
@@ -1678,8 +1864,14 @@
         // Tampilkan loading screen
         showLoadingScreen();
         
+        // Setup event listeners terlebih dahulu
+        setupEventListeners();
+        
         // Load data dengan prioritas render cepat
         await loadDataFromFirebase();
+        
+        // Update UI dengan config store setelah data loaded
+        updateUIWithConfig();
         
         // Setup realtime listener (background)
         if (database) {
@@ -1697,6 +1889,9 @@
                     if (adminDashboardDiv.style.display === 'block') {
                         renderAdminDashboard();
                     }
+
+                    // Update config juga
+                    updateUIWithConfig();
                 }
             });
         }
@@ -1718,7 +1913,7 @@
             hideLoadingScreen();
         }, 800);
         
-        // Event listeners
+        // Event listeners untuk history
         window.addEventListener('popstate', (event) => {
             const targetPage = event.state && event.state.page ? event.state.page : 'main';
             showPage(targetPage, true, true); 
